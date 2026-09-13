@@ -1,3 +1,4 @@
+#include <iostream>
 #include <type_traits>
 #include <array>
 
@@ -5,14 +6,22 @@ template <typename T>
 class UniquePtr {
 private:
     T* ptr;
+
+    void deleter() {
+        if (std::is_array<T>::value == 1) {
+            delete[] ptr;
+            std::cout << "array deleted\n";
+        } else {
+            delete ptr; 
+            std::cout << "not array deleted\n";
+        }
+    }
+
 public:
 
-    UniquePtr(T* p = nullptr) : ptr(p) {}
+    UniquePtr(T* p = nullptr) : ptr(p) { std::cout << "unique constructor called\n"; }
     ~UniquePtr() { 
-        if (std::is_array<*ptr>::value == 1)
-            delete[] ptr;
-        else
-            delete ptr; 
+        deleter();
     }
 
     UniquePtr(const UniquePtr&) = delete;
@@ -20,16 +29,15 @@ public:
 
     UniquePtr(UniquePtr&& other) noexcept : ptr(other.ptr) {
         other.ptr = nullptr;
+        std::cout << "unique move constructor called\n";
     }
     UniquePtr& operator=(UniquePtr&& other) noexcept {
         if (this != &other) {
-            if (std::is_array<*ptr>::value == 1)
-                delete[] ptr;
-            else
-                delete ptr; 
+            deleter();
             ptr = other.ptr;
             other.ptr = nullptr;
         }
+        std::cout << "unique move operator= called\n";
         return *this;
     }
 
@@ -45,11 +53,9 @@ public:
         return tmp;
     }
     void reset(T* p = nullptr) {
+        std::cout << "reset is called\n";
         if (ptr != p) {
-            if (std::is_array<*ptr>::value == 1)
-                delete[] ptr;
-            else
-                delete ptr; 
+            deleter();
             ptr = p;
         }
     }
