@@ -4,7 +4,7 @@
 #include <iostream>
 
 struct TestObject {
-    // inline static позволяет объявить переменную прямо в заголовочном файле (C++17)
+    
     inline static int alive_count = 0; 
     inline static int total_created = 0;
 

@@ -1,7 +1,3 @@
-#include <iostream>
-#include <type_traits>
-#include <array>
-
 template <typename T>
 class SharedPtr {
 private:
