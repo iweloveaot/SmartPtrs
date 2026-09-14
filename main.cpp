@@ -6,25 +6,18 @@
 #include "unq_ptr.h"
 #include "shrd_ptr.h"
 
-// ==========================================
-// Утилита для безопасного чтения чисел
-// ==========================================
+
 int safe_read_int() {
     int value;
-    // Пытаемся прочитать число. Если не получается (ввели буквы)...
+
     while (!(std::cin >> value)) {
         std::cout << "Invalid input. Please enter a number: ";
-        std::cin.clear();             // 1. Сбрасываем флаг ошибки потока
-        std::cin.ignore(10000, '\n'); // 2. Очищаем буфер ввода от "мусора" до конца строки
+        std::cin.clear();             
+        std::cin.ignore(10000, '\n'); 
     }
-    // Очищаем остаток строки (например, если ввели "123 abc", мы считали 123, но "abc" осталось в буфере)
     std::cin.ignore(10000, '\n'); 
     return value;
 }
-
-// ==========================================
-// Интерактивные демо-сценарии
-// ==========================================
 
 void demo_unique_single() {
     std::cout << "\n[UniquePtr<int> Interactive Demo]\n";
@@ -44,7 +37,7 @@ void demo_unique_single() {
         std::cout << "0. Back to main demo menu\n";
         std::cout << ">> ";
         
-        cmd = safe_read_int(); // Безопасный ввод
+        cmd = safe_read_int();
         
         if (cmd == 1) { 
             std::cout << "Enter value: ";
@@ -200,10 +193,6 @@ void demo_shared_array() {
         }
     }
 }
-
-// ==========================================
-// Главное меню
-// ==========================================
 
 void run_interactive_demo() {
     int choice = -1;

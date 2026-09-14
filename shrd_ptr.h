@@ -130,7 +130,7 @@ public:
     T* get() const { return ptr; }
     void reset(T* p = nullptr) {
         if (ptr != p) {
-            if (--(*ref_count) == 0) {
+            if (ref_count && --(*ref_count) == 0) {
                 delete[] ptr;
                 delete ref_count;
             }

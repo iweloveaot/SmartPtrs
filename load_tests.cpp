@@ -1,4 +1,3 @@
-// load_tests.cpp
 #include "load_tests.h"
 #include "unq_ptr.h"
 #include "shrd_ptr.h"
@@ -11,10 +10,7 @@
 #include <cstring>
 #include <cstdio>
 
-// ===================== Утилиты для замеров =====================
 
-// Чтение текущей резидентной памяти процесса (RSS) в килобайтах.
-// Работает на Linux и WSL. На других ОС вернёт 0.
 size_t get_rss_kb() {
     size_t rss = 0;
     FILE* fp = fopen("/proc/self/status", "r");
@@ -31,19 +27,16 @@ size_t get_rss_kb() {
     return rss;
 }
 
-// Структура для хранения результатов одного замера
+
 struct BenchResult {
     double time_ms;
     size_t memory_kb;
 };
 
-// ===================== Функции замеров =====================
 
-// --- 1. Сырой указатель ---
 BenchResult bench_raw(size_t N) {
     BenchResult res;
     
-    // Замер памяти: выделяем все объекты и держим их живыми
     size_t mem_before = get_rss_kb();
     std::vector<int*> ptrs(N);
     for (size_t i = 0; i < N; ++i) {
@@ -53,7 +46,6 @@ BenchResult bench_raw(size_t N) {
     res.memory_kb = (mem_after > mem_before) ? (mem_after - mem_before) : 0;
     for (size_t i = 0; i < N; ++i) delete ptrs[i];
     
-    // Замер времени: создаём и сразу уничтожаем
     volatile int sink = 0;
     auto t0 = std::chrono::high_resolution_clock::now();
     for (size_t i = 0; i < N; ++i) {
@@ -67,7 +59,6 @@ BenchResult bench_raw(size_t N) {
     return res;
 }
 
-// --- 2. Ваш UniquePtr ---
 BenchResult bench_my_unique(size_t N) {
     BenchResult res;
     
@@ -93,7 +84,6 @@ BenchResult bench_my_unique(size_t N) {
     return res;
 }
 
-// --- 3. STL unique_ptr ---
 BenchResult bench_stl_unique(size_t N) {
     BenchResult res;
     
@@ -119,7 +109,6 @@ BenchResult bench_stl_unique(size_t N) {
     return res;
 }
 
-// --- 4. Ваш SharedPtr ---
 BenchResult bench_my_shared(size_t N) {
     BenchResult res;
     
@@ -145,7 +134,6 @@ BenchResult bench_my_shared(size_t N) {
     return res;
 }
 
-// --- 5. STL shared_ptr ---
 BenchResult bench_stl_shared(size_t N) {
     BenchResult res;
     
@@ -171,15 +159,12 @@ BenchResult bench_stl_shared(size_t N) {
     return res;
 }
 
-// ===================== Основная функция =====================
 
 void run_load_tests() {
     std::cout << "\n========== STARTING LOAD TESTS ==========\n\n";
     
-    // Размеры тестов: малый и большой
     size_t test_sizes[] = {10000, 100000, 1000000};
     
-    // Открываем CSV для графиков
     std::ofstream csv("benchmark_results.csv");
     csv << "N"
         << ";Raw_Time_ms;Raw_Mem_KB"
@@ -198,7 +183,6 @@ void run_load_tests() {
         BenchResult my_shr   = bench_my_shared(N);
         BenchResult stl_shr  = bench_stl_shared(N);
 
-        // Красивый табличный вывод в консоль
         printf("  %-18s %12s %12s\n", "Type", "Time (ms)", "Memory (KB)");
         printf("  %-18s %12.2f %12zu\n", "Raw Pointer",      raw.time_ms,     raw.memory_kb);
         printf("  %-18s %12.2f %12zu\n", "My UniquePtr",     my_unq.time_ms,  my_unq.memory_kb);
@@ -207,7 +191,6 @@ void run_load_tests() {
         printf("  %-18s %12.2f %12zu\n", "STL shared_ptr",   stl_shr.time_ms, stl_shr.memory_kb);
         std::cout << "\n";
 
-        // Запись в CSV (разделитель — точка с запятой для корректного открытия в Excel)
         csv << N
             << ";" << raw.time_ms     << ";" << raw.memory_kb
             << ";" << my_unq.time_ms  << ";" << my_unq.memory_kb
