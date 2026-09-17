@@ -6,13 +6,11 @@
 struct TestObject {
     
     inline static int alive_count = 0; 
-    inline static int total_created = 0;
 
     int value;
     
     TestObject(int v = 0) : value(v) { 
         ++alive_count; 
-        ++total_created;
     }
     
     ~TestObject() { 
@@ -21,7 +19,6 @@ struct TestObject {
     
     static void reset_stats() {
         alive_count = 0;
-        total_created = 0;
     }
 };
 
